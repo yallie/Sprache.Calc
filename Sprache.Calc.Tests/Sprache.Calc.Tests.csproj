@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpressionExtensions.cs" />
+    <Compile Include="ScientificCalculatorFacts.cs" />
     <Compile Include="SimpleCalculatorFacts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
