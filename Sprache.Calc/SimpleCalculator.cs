@@ -86,12 +86,12 @@ namespace Sprache.Calc
 			}
 		}
 
-		protected virtual Parser<Expression> Factor
+		protected internal virtual Parser<Expression> Factor
 		{
 			get { return ExpressionInParentheses.XOr(Constant); }
 		}
 
-		protected virtual Parser<Expression> NegativeFactor
+		protected internal virtual Parser<Expression> NegativeFactor
 		{
 			get
 			{
@@ -102,27 +102,27 @@ namespace Sprache.Calc
 			}
 		}
 
-		protected virtual Parser<Expression> Operand
+		protected internal virtual Parser<Expression> Operand
 		{
 			get { return (NegativeFactor.XOr(Factor)).Token(); }
 		}
 
-		protected virtual Parser<Expression> InnerTerm
+		protected internal virtual Parser<Expression> InnerTerm
 		{
-			get { return Parse.ChainOperator(Power, Operand, Expression.MakeBinary); }
+			get { return Parse.ChainRightOperator(Power, Operand, Expression.MakeBinary); }
 		}
 
-		protected virtual Parser<Expression> Term
+		protected internal virtual Parser<Expression> Term
 		{
 			get { return Parse.ChainOperator(Multiply.Or(Divide).Or(Modulo), InnerTerm, Expression.MakeBinary); }
 		}
 
-		protected virtual Parser<Expression> Expr
+		protected internal virtual Parser<Expression> Expr
 		{
 			get { return Parse.ChainOperator(Add.Or(Subtract), Term, Expression.MakeBinary); }
 		}
 
-		protected virtual Parser<Expression<Func<double>>> Lambda
+		protected internal virtual Parser<Expression<Func<double>>> Lambda
 		{
 			get { return Expr.End().Select(body => Expression.Lambda<Func<double>>(body)); }
 		}
