@@ -60,7 +60,7 @@ namespace Sprache.Calc
 			}
 		}
 
-		protected internal virtual Expression CallFunction(string name, Expression[] parameters)
+		protected internal virtual Expression CallFunction(string name, params Expression[] parameters)
 		{
 			var methodInfo = typeof(Math).GetMethod(name, parameters.Select(e => e.Type).ToArray());
 			if (methodInfo == null)

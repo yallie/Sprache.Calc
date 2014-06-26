@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -9,7 +10,9 @@ namespace Sprache.Calc.Tests
 {
 	public class XtensibleCalculatorFacts
 	{
-		private XtensibleCalculator calc = new XtensibleCalculator();
+		private XtensibleCalculator calc = new XtensibleCalculator()
+			.RegisterFunction("Min", (x, y, z) => Math.Min(x, Math.Min(y, z)))
+			.RegisterFunction("Mul", (a, b, c, d, e) => a * b * c * d * e);
 
 		[Fact]
 		public void GetParameterExpressionSupportsSystemMathConstantsAndCustomVariables()
@@ -48,6 +51,21 @@ namespace Sprache.Calc.Tests
 		{
 			Assert.Equal("() => Invoke(Parameters => 0, null)", calc.ParseExpression("0").ToString());
 			Assert.Equal(System.Math.E, calc.ParseExpression("E").Compile().DynamicInvoke());
+		}
+
+		[Fact]
+		public void MangleNameProducesMangledFunctionName()
+		{
+			Assert.Equal(":0", calc.MangleName(null, 0));
+			Assert.Equal("MySine:2", calc.MangleName("MySine", 2));
+		}
+
+		[Fact]
+		public void CallFunctionSupportsRegisteredFunctionsAsWellAsSystemMathFunctions()
+		{
+			Assert.Equal(2d, calc.CallFunction("Min", Expression.Constant(2d), Expression.Constant(3d)).Execute()); // System.Math.Min
+			Assert.Equal(1d, calc.CallFunction("Min", Expression.Constant(2d), Expression.Constant(3d), Expression.Constant(1d)).Execute()); // custom
+			Assert.Throws<ParseException>(() => calc.CallFunction("Mul", Expression.Constant(0d)));
 		}
 	}
 }
