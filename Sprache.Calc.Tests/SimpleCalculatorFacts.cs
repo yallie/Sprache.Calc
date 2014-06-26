@@ -13,7 +13,7 @@ namespace Sprache.Calc.Tests
 	{
 		private void ForEachCalculator(Action<SimpleCalculator> fact)
 		{
-			foreach (var calc in new[] { new SimpleCalculator(), new ScientificCalculator() })
+			foreach (var calc in new[] { new SimpleCalculator(), new ScientificCalculator(), new XtensibleCalculator() })
 			{
 				fact(calc);
 			}
@@ -175,12 +175,12 @@ namespace Sprache.Calc.Tests
 		[Fact]
 		public void LambdaProducesExpressionThatCanBeCompiledAndExecuted()
 		{
-			ForEachCalculator(calc =>
+			foreach (var calc in new[] { new SimpleCalculator(), new ScientificCalculator() })
 			{
-				Assert.Equal(3.14159d, Math.Round(calc.Lambda.Parse("4*(1/1-1/3+1/5-1/7+1/9-1/11+1/13-1/15+1/17-1/19+10/401)").Compile()(), 5));
-				Assert.Equal(2.97215d, Math.Round(calc.Lambda.Parse("2*(2/1*2/3*4/3*4/5*6/5*6/7*8/7*8/9)").Compile()(), 5));
-				Assert.Equal(Math.E.ToString(), calc.Lambda.Parse(string.Format(CultureInfo.InvariantCulture, "{0}", Math.E)).Compile()().ToString());
-			});
+				Assert.Equal(3.14159d, Math.Round((double)calc.Lambda.Parse("4*(1/1-1/3+1/5-1/7+1/9-1/11+1/13-1/15+1/17-1/19+10/401)").Compile().DynamicInvoke(), 5));
+				Assert.Equal(2.97215d, Math.Round((double)calc.Lambda.Parse("2*(2/1*2/3*4/3*4/5*6/5*6/7*8/7*8/9)").Compile().DynamicInvoke(), 5));
+				Assert.Equal(Math.E.ToString(), calc.Lambda.Parse(string.Format(CultureInfo.InvariantCulture, "{0}", Math.E)).Compile().DynamicInvoke().ToString());
+			}
 		}
 
 		[Fact]

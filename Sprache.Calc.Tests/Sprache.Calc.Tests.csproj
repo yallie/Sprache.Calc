@@ -51,6 +51,7 @@
     <Compile Include="ScientificCalculatorFacts.cs" />
     <Compile Include="SimpleCalculatorFacts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XtensibleCalculatorFacts.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

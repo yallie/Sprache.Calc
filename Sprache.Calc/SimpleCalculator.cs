@@ -122,14 +122,14 @@ namespace Sprache.Calc
 			get { return Parse.ChainOperator(Add.Or(Subtract), Term, Expression.MakeBinary); }
 		}
 
-		protected internal virtual Parser<Expression<Func<double>>> Lambda
+		protected internal virtual Parser<LambdaExpression> Lambda
 		{
 			get { return Expr.End().Select(body => Expression.Lambda<Func<double>>(body)); }
 		}
 
 		public virtual Expression<Func<double>> ParseExpression(string text)
 		{
-			return Lambda.Parse(text);
+			return Lambda.Parse(text) as Expression<Func<double>>;
 		}
 	}
 }
