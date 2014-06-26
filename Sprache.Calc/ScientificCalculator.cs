@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -8,10 +9,35 @@ using System.Threading.Tasks;
 namespace Sprache.Calc
 {
 	/// <summary>
-	/// Scientific calculator grammar. Supports System.Math functions.
+	/// Scientific calculator grammar. Supports hexadecimal numbers and System.Math functions.
 	/// </summary>
 	public class ScientificCalculator : SimpleCalculator
 	{
+		protected internal virtual Parser<string> Hexadecimal
+		{
+			get
+			{
+				return Parse.String("0x").Or(Parse.String("0X")).Then(x =>
+					Parse.Chars("0123456789ABCDEFabcdef").AtLeastOnce().Text()).Token();
+			}
+		}
+
+		protected internal virtual ulong ConvertHexadecimal(string hex)
+		{
+			var result = 0ul;
+			if (ulong.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result))
+			{
+				return result;
+			}
+
+			throw new ParseException(hex + " cannot be parsed as hexadecimal number");
+		}
+
+		protected internal override Parser<Expression> Constant
+		{
+			get { return Hexadecimal.Select(x => Expression.Constant((double)ConvertHexadecimal(x))).Or(base.Constant); }
+		}
+
 		protected internal virtual Parser<string> Identifier
 		{
 			get
