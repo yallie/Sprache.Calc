@@ -12,23 +12,23 @@ namespace Sprache.Calc.Tests
 		private XtensibleCalculator calc = new XtensibleCalculator();
 
 		[Fact]
-		public void GetVariableExpressionSupportsSystemMathConstantsAndCustomVariables()
+		public void GetParameterExpressionSupportsSystemMathConstantsAndCustomVariables()
 		{
-			Assert.Equal(System.Math.PI, calc.GetVariableExpression("PI").Execute());
-			Assert.Equal(System.Math.E, calc.GetVariableExpression("E").Execute());
-			Assert.Equal("Parameters.get_Item(\"Dummy\")", calc.GetVariableExpression("Dummy").ToString());
+			Assert.Equal(System.Math.PI, calc.GetParameterExpression("PI").Execute());
+			Assert.Equal(System.Math.E, calc.GetParameterExpression("E").Execute());
+			Assert.Equal("Parameters.get_Item(\"Dummy\")", calc.GetParameterExpression("Dummy").ToString());
 		}
 
 		[Fact]
-		public void VariableIsAnIdentifierNotFollowedByParens()
+		public void ParameterIsAnIdentifierNotFollowedByParens()
 		{
-			Assert.Equal(System.Math.PI, calc.Variable.Parse("PI").Execute());
-			Assert.Equal(System.Math.E, calc.Variable.Parse("E").Execute());
-			Assert.Throws<ParseException>(() => calc.Variable.Parse("E(1)").Execute());
+			Assert.Equal(System.Math.PI, calc.Parameter.Parse("PI").Execute());
+			Assert.Equal(System.Math.E, calc.Parameter.Parse("E").Execute());
+			Assert.Throws<ParseException>(() => calc.Parameter.Parse("E(1)").Execute());
 		}
 
 		[Fact]
-		public void FactorSupportsVariablesAndFunctions()
+		public void FactorSupportsParametersAndFunctions()
 		{
 			Assert.Equal(0, calc.Factor.Parse("Sin(0)").Execute());
 			Assert.Equal(System.Math.PI, calc.Factor.Parse("PI").Execute());

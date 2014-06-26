@@ -10,41 +10,41 @@ using ParameterList = System.Collections.Generic.Dictionary<string, double>;
 namespace Sprache.Calc
 {
 	/// <summary>
-	/// Extensible calculator can be extended with custom functions and variables.
+	/// Extensible calculator can be extended with custom functions and parameters.
 	/// </summary>
 	public class XtensibleCalculator : ScientificCalculator
 	{
-		protected internal virtual Parser<Expression> Variable
+		protected internal virtual Parser<Expression> Parameter
 		{
 			get
 			{
-				// identifier not followed by a '(' is a variable reference
+				// identifier not followed by a '(' is a parameter reference
 				return
 					from id in Identifier
 					from n in Parse.Not(Parse.Char('('))
-					select GetVariableExpression(id);
+					select GetParameterExpression(id);
 			}
 		}
 
 		protected internal override Parser<Expression> Factor
 		{
-			get { return Variable.Or(base.Factor); }
+			get { return Parameter.Or(base.Factor); }
 		}
 
-		protected internal virtual Expression GetVariableExpression(string id)
+		protected internal virtual Expression GetParameterExpression(string name)
 		{
 			// try to find a constant in System.Math
 			var systemMathConstants = typeof(System.Math).GetFields(BindingFlags.Public | BindingFlags.Static);
-			var constant = systemMathConstants.FirstOrDefault(c => c.Name == id);
+			var constant = systemMathConstants.FirstOrDefault(c => c.Name == name);
 			if (constant != null)
 			{
 				// return System.Math constant value
 				return Expression.Constant(constant.GetValue(null));
 			}
 
-			// return custom variable: Variables[id]
+			// return parameter value: Parameters[name]
 			var getItemMethod = typeof(ParameterList).GetMethod("get_Item");
-			return Expression.Call(ParameterExpression, getItemMethod, Expression.Constant(id));
+			return Expression.Call(ParameterExpression, getItemMethod, Expression.Constant(name));
 		}
 
 		private ParameterExpression parameterInstance = Expression.Parameter(typeof(ParameterList), "Parameters");
