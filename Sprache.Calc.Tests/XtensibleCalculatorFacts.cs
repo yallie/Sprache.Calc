@@ -47,10 +47,32 @@ namespace Sprache.Calc.Tests
 		}
 
 		[Fact]
+		public void ParseExpressionAcceptsDefaultParameterDictionary()
+		{
+			var parameters = new Dictionary<string, double> { { "Dummy", 123 }, { "Yummy", 456 } };
+			var compiledFunction = calc.ParseExpression("Dummy+Yummy", parameters).Compile();
+			Assert.Equal(579d, compiledFunction());
+		}
+
+		[Fact]
+		public void ParseExpressionAcceptsDefaultParameterExpressions()
+		{
+			var compiledFunction = calc.ParseExpression("Dummy+Yummy", Dummy => 123, Yummy => 456).Compile();
+			Assert.Equal(579d, compiledFunction());
+		}
+
+		[Fact]
+		public void ParseExpressionAcceptsDefaultParameterAnonymousClass()
+		{
+			var compiledFunction = calc.ParseExpression("Dummy+Yummy", new { Dummy = 123, Yummy = 456 }).Compile();
+			Assert.Equal(579d, compiledFunction());
+		}
+
+		[Fact]
 		public void OverriddenParseExpressionMethodStillWorks()
 		{
-			Assert.Equal("() => Invoke(Parameters => 0, null)", calc.ParseExpression("0").ToString());
-			Assert.Equal(System.Math.E, calc.ParseExpression("E").Compile().DynamicInvoke());
+			Assert.Equal(0d, calc.ParseExpression("0").Compile()());
+			Assert.Equal(System.Math.E, calc.ParseExpression("E").Compile()());
 		}
 
 		[Fact]
@@ -64,7 +86,7 @@ namespace Sprache.Calc.Tests
 		public void CallFunctionSupportsRegisteredFunctionsAsWellAsSystemMathFunctions()
 		{
 			Assert.Equal(2d, calc.CallFunction("Min", Expression.Constant(2d), Expression.Constant(3d)).Execute()); // System.Math.Min
-			Assert.Equal(1d, calc.CallFunction("Min", Expression.Constant(2d), Expression.Constant(3d), Expression.Constant(1d)).Execute()); // custom
+			Assert.Equal(1d, calc.CallFunction("Min", Expression.Constant(2d), Expression.Constant(3d), Expression.Constant(1d)).Execute()); // custom Min
 			Assert.Throws<ParseException>(() => calc.CallFunction("Mul", Expression.Constant(0d)));
 		}
 	}

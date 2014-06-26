@@ -65,12 +65,45 @@ namespace Sprache.Calc
 			return Lambda.Parse(text) as Expression<Func<ParameterList, double>>;
 		}
 
-		public override Expression<Func<double>> ParseExpression(string text)
+		public virtual Expression<Func<double>> ParseExpression(string text, ParameterList parameters)
 		{
 			// VariableList => double is converted to () => double 
 			var sourceExpression = ParseFunction(text);
-			var newBody = Expression.Invoke(sourceExpression, Expression.Constant(null, typeof(ParameterList)));
+			var newBody = Expression.Invoke(sourceExpression, Expression.Constant(parameters));
 			return Expression.Lambda<Func<double>>(newBody);
+		}
+
+		public override Expression<Func<double>> ParseExpression(string text)
+		{
+			return ParseExpression(text, new ParameterList());
+		}
+
+		public virtual Expression<Func<double>> ParseExpression(string text, params Expression<Func<double, double>>[] parameters)
+		{
+			// syntactic sugar: ParseExpression("a*b-b*c", a => 1, b => 2, c => 3)
+			var paramList = new ParameterList();
+			foreach (var p in parameters)
+			{
+				var paramName = p.Parameters.Single().Name;
+				var paramValue = p.Compile()(0);
+				paramList[paramName] = paramValue;
+			}
+
+			return ParseExpression(text, paramList);
+		}
+
+		public virtual Expression<Func<double>> ParseExpression(string text, object anonymous)
+		{
+			// syntactic sugar: ParseExpression("a + b / c", new { a = 1, b = 2, c = 3 })
+			var paramList = new ParameterList();
+			foreach (var p in anonymous.GetType().GetProperties())
+			{
+				var paramName = p.Name;
+				var paramValue = Convert.ToDouble(p.GetValue(anonymous));
+				paramList[paramName] = paramValue;
+			}
+
+			return ParseExpression(text, paramList);
 		}
 
 		private Dictionary<string, CustomFunction> customFunctions = new Dictionary<string, CustomFunction>();
