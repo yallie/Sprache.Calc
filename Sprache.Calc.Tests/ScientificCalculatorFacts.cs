@@ -42,13 +42,42 @@ namespace Sprache.Calc.Tests
 		}
 
 		[Fact]
-		public void ConstantCanBeDecimalOrHexadecimal()
+		public void ExponentIsAWholeNumberFollowingEChar()
+		{
+			ForEachCalculator(calc =>
+			{
+				Assert.Equal("e+1", calc.Exponent.Parse("e1"));
+				Assert.Equal("e-10", calc.Exponent.Parse("E-10"));
+				Assert.Equal("e+12345", calc.Exponent.Parse("E12345"));
+				Assert.Throws<ParseException>(() => calc.Exponent.Parse("e"));
+			});
+		}
+
+		[Fact]
+		public void DecimalNumbersMayHaveOptionalExponentPart()
+		{
+			ForEachCalculator(calc =>
+			{
+				Assert.Equal(".1e+1", calc.Decimal.Parse(".1e1"));
+				Assert.Equal("3.14e-10", calc.Decimal.Parse("3.14E-10"));
+				Assert.Equal("2.718e+20", calc.Decimal.Parse("2.718e+20"));
+				Assert.Equal("54321e+12345", calc.Decimal.Parse("54321E12345"));
+				Assert.Equal(".5", calc.Decimal.Parse(".5"));
+				Assert.Equal("123", calc.Decimal.Parse("123"));
+				Assert.Throws<ParseException>(() => calc.Decimal.Parse("e"));
+			});
+		}
+
+		[Fact]
+		public void ConstantCanBeHexadecimalOrDecimalWithOrWithoutExponent()
 		{
 			ForEachCalculator(calc =>
 			{
 				Assert.Equal((double)0xABC, calc.Constant.Parse("0xabc").Execute());
 				Assert.Equal((double)0x123ul, calc.Constant.Parse(" 0X123").Execute());
-				Assert.Equal((double)123, calc.Constant.Parse("123 ").Execute());
+				Assert.Equal(123d, calc.Constant.Parse("123 ").Execute());
+				Assert.Equal(123e15d, calc.Constant.Parse("123e15").Execute());
+				Assert.Equal(2.718e-5d, calc.Constant.Parse("2.718e-5 ").Execute());
 				Assert.Equal(010110100d, calc.Constant.Parse("010110100").Execute());
 				Assert.Throws<ParseException>(() => calc.Constant.End().Parse("0x"));
 			});

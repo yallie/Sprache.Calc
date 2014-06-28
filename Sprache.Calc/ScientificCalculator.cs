@@ -33,6 +33,26 @@ namespace Sprache.Calc
 			throw new ParseException(hex + " cannot be parsed as hexadecimal number");
 		}
 
+		protected internal virtual Parser<string> Exponent
+		{
+			get
+			{
+				return Parse.Chars("Ee").Then(e => Parse.Number.Select(n => "e+" + n).XOr(
+					Parse.Chars("+-").Then(s => Parse.Number.Select(n => "e" + s + n))));
+			}
+		}
+
+		protected internal override Parser<string> Decimal
+		{
+			get
+			{
+				return
+					from d in base.Decimal
+					from e in Exponent.Optional()
+					select d + e.GetOrElse(string.Empty);
+			}
+		}
+
 		protected internal override Parser<Expression> Constant
 		{
 			get { return Hexadecimal.Select(x => Expression.Constant((double)ConvertHexadecimal(x))).Or(base.Constant); }
