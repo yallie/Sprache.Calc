@@ -18,7 +18,7 @@ namespace Sprache.Calc
 		{
 			get
 			{
-				return Parse.String("0b").Or(Parse.String("0B")).Then(x =>
+				return Parse.IgnoreCase("0b").Then(x =>
 					Parse.Chars("01").AtLeastOnce().Text()).Token();
 			}
 		}
@@ -27,7 +27,7 @@ namespace Sprache.Calc
 		{
 			get
 			{
-				return Parse.String("0x").Or(Parse.String("0X")).Then(x =>
+				return Parse.IgnoreCase("0x").Then(x =>
 					Parse.Chars("0123456789ABCDEFabcdef").AtLeastOnce().Text()).Token();
 			}
 		}
