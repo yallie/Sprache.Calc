@@ -11,7 +11,8 @@ using ParameterList = System.Collections.Generic.Dictionary<string, double>;
 namespace Sprache.Calc
 {
 	/// <summary>
-	/// Extensible calculator can be extended with custom functions and parameters.
+	/// Extensible calculator. 
+	/// Supports named parameters and custom functions.
 	/// </summary>
 	public class XtensibleCalculator : ScientificCalculator
 	{

@@ -9,10 +9,20 @@ using System.Threading.Tasks;
 namespace Sprache.Calc
 {
 	/// <summary>
-	/// Scientific calculator grammar. Supports hexadecimal numbers and System.Math functions.
+	/// Scientific calculator grammar.
+	/// Supports binary and hexadecimal numbers, exponential notation and functions defined in System.Math.
 	/// </summary>
 	public class ScientificCalculator : SimpleCalculator
 	{
+		protected internal virtual Parser<string> Binary
+		{
+			get
+			{
+				return Parse.String("0b").Or(Parse.String("0B")).Then(x =>
+					Parse.Chars("01").AtLeastOnce().Text()).Token();
+			}
+		}
+
 		protected internal virtual Parser<string> Hexadecimal
 		{
 			get
@@ -20,6 +30,19 @@ namespace Sprache.Calc
 				return Parse.String("0x").Or(Parse.String("0X")).Then(x =>
 					Parse.Chars("0123456789ABCDEFabcdef").AtLeastOnce().Text()).Token();
 			}
+		}
+
+		protected internal virtual ulong ConvertBinary(string bin)
+		{
+			return bin.Aggregate(0ul, (result, c) =>
+			{
+				if (c < '0' || c > '1')
+				{
+					throw new ParseException(bin + " cannot be parsed as binary number");
+				}
+
+				return result * 2 + c - '0';
+			});
 		}
 
 		protected internal virtual ulong ConvertHexadecimal(string hex)
@@ -55,7 +78,13 @@ namespace Sprache.Calc
 
 		protected internal override Parser<Expression> Constant
 		{
-			get { return Hexadecimal.Select(x => Expression.Constant((double)ConvertHexadecimal(x))).Or(base.Constant); }
+			get
+			{
+				return
+					Hexadecimal.Select(x => Expression.Constant((double)ConvertHexadecimal(x)))
+					.Or(Binary.Select(b => Expression.Constant((double)ConvertBinary(b))))
+					.Or(base.Constant);
+			}
 		}
 
 		protected internal virtual Parser<string> Identifier

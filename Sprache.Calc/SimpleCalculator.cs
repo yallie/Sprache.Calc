@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 namespace Sprache.Calc
 {
 	/// <summary>
-	/// Simple calculator grammar. Suppors arithmetic operations.
+	/// Simple calculator grammar.
+	/// Supports arithmetic operations and parentheses.
 	/// </summary>
 	public class SimpleCalculator
 	{
