@@ -7,7 +7,17 @@ representation of an expression and converts it to a structured LINQ expression 
 which can easily be compiled to an executable delegate. In contrast with interpreting expression
 evaluators such as NCalc, compiled expressions perform just as fast as native C# methods.
 
-Usage example:
+Installation
+------------
+
+To install Sprache Calculator, use NuGet package manager or run the following command in the Package Manager Console:
+
+````
+PM> Install-Package Sprache.Calc
+````
+
+Usage example
+-------------
 
 ```csharp
 var calc = new Sprache.Calc.XtensibleCalculator();
