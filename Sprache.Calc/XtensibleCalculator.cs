@@ -100,7 +100,7 @@ namespace Sprache.Calc
 			foreach (var p in anonymous.GetType().GetProperties())
 			{
 				var paramName = p.Name;
-				var paramValue = Convert.ToDouble(p.GetValue(anonymous));
+				var paramValue = Convert.ToDouble(p.GetValue(anonymous, new object[0]));
 				paramList[paramName] = paramValue;
 			}
 
