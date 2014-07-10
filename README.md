@@ -34,7 +34,7 @@ by running the following command in the Package Manager Console:
 PM> Install-Package Sprache.Calc
 ````
 
-Grammar inheritance tecnhique
+Grammar inheritance technique
 -----------------------------
 
 Sprache.Calc library serves as a demonstration of grammar inheritance technique with Sprache toolkit.
