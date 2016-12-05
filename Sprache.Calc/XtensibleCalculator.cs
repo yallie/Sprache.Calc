@@ -3,35 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using CustomFunction = System.Func<double[], double>;
 using ParameterList = System.Collections.Generic.Dictionary<string, double>;
 
 namespace Sprache.Calc
 {
 	/// <summary>
-	/// Extensible calculator. 
+	/// Extensible calculator.
 	/// Supports named parameters and custom functions.
 	/// </summary>
 	public class XtensibleCalculator : ScientificCalculator
 	{
-		protected internal virtual Parser<Expression> Parameter
-		{
-			get
-			{
-				// identifier not followed by a '(' is a parameter reference
-				return
-					from id in Identifier
-					from n in Parse.Not(Parse.Char('('))
-					select GetParameterExpression(id);
-			}
-		}
+		protected internal virtual Parser<Expression> Parameter =>
+			// identifier not followed by a '(' is a parameter reference
+			from id in Identifier
+			from n in Parse.Not(Parse.Char('('))
+			select GetParameterExpression(id);
 
-		protected internal override Parser<Expression> Factor
-		{
-			get { return Parameter.Or(base.Factor); }
-		}
+		protected internal override Parser<Expression> Factor =>
+			Parameter.Or(base.Factor);
 
 		protected internal virtual Expression GetParameterExpression(string name)
 		{
@@ -49,35 +39,25 @@ namespace Sprache.Calc
 			return Expression.Call(ParameterExpression, getItemMethod, Expression.Constant(name));
 		}
 
-		private ParameterExpression parameterInstance = Expression.Parameter(typeof(ParameterList), "Parameters");
+		protected internal virtual ParameterExpression ParameterExpression { get; } =
+			Expression.Parameter(typeof(ParameterList), "Parameters");
 
-		protected internal virtual ParameterExpression ParameterExpression
-		{
-			get { return parameterInstance; }
-		}
+		protected internal override Parser<LambdaExpression> Lambda =>
+			Expr.End().Select(body => Expression.Lambda<Func<ParameterList, double>>(body, ParameterExpression));
 
-		protected internal override Parser<LambdaExpression> Lambda
-		{
-			get { return Expr.End().Select(body => Expression.Lambda<Func<ParameterList, double>>(body, ParameterExpression)); }
-		}
-
-		public virtual Expression<Func<ParameterList, double>> ParseFunction(string text)
-		{
-			return Lambda.Parse(text) as Expression<Func<ParameterList, double>>;
-		}
+		public virtual Expression<Func<ParameterList, double>> ParseFunction(string text) =>
+			Lambda.Parse(text) as Expression<Func<ParameterList, double>>;
 
 		public virtual Expression<Func<double>> ParseExpression(string text, ParameterList parameters)
 		{
-			// VariableList => double is converted to () => double 
+			// VariableList => double is converted to () => double
 			var sourceExpression = ParseFunction(text);
 			var newBody = Expression.Invoke(sourceExpression, Expression.Constant(parameters));
 			return Expression.Lambda<Func<double>>(newBody);
 		}
 
-		public override Expression<Func<double>> ParseExpression(string text)
-		{
-			return ParseExpression(text, new ParameterList());
-		}
+		public override Expression<Func<double>> ParseExpression(string text) =>
+			ParseExpression(text, new ParameterList());
 
 		public virtual Expression<Func<double>> ParseExpression(string text, params Expression<Func<double, double>>[] parameters)
 		{
@@ -107,17 +87,11 @@ namespace Sprache.Calc
 			return ParseExpression(text, paramList);
 		}
 
-		private Dictionary<string, CustomFunction> customFunctions = new Dictionary<string, CustomFunction>();
+		protected internal virtual Dictionary<string, CustomFunction> CustomFuctions { get; } =
+			new Dictionary<string, CustomFunction>();
 
-		protected internal virtual Dictionary<string, CustomFunction> CustomFuctions
-		{
-			get { return customFunctions; }
-		}
-
-		protected internal virtual string MangleName(string name, int paramCount)
-		{
-			return name + ":" + paramCount;
-		}
+		protected internal virtual string MangleName(string name, int paramCount) =>
+			name + ":" + paramCount;
 
 		protected internal override Expression CallFunction(string name, params Expression[] parameters)
 		{
@@ -139,10 +113,8 @@ namespace Sprache.Calc
 			return base.CallFunction(name, parameters);
 		}
 
-		protected virtual double CallCustomFunction(string mangledName, double[] parameters)
-		{
-			return CustomFuctions[mangledName](parameters);
-		}
+		protected virtual double CallCustomFunction(string mangledName, double[] parameters) =>
+			CustomFuctions[mangledName](parameters);
 
 		public XtensibleCalculator RegisterFunction(string name, Func<double> function)
 		{

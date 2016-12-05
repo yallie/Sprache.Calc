@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sprache.Calc
 {
@@ -14,23 +11,13 @@ namespace Sprache.Calc
 	/// </summary>
 	public class ScientificCalculator : SimpleCalculator
 	{
-		protected internal virtual Parser<string> Binary
-		{
-			get
-			{
-				return Parse.IgnoreCase("0b").Then(x =>
-					Parse.Chars("01").AtLeastOnce().Text()).Token();
-			}
-		}
+		protected internal virtual Parser<string> Binary =>
+			Parse.IgnoreCase("0b").Then(x =>
+				Parse.Chars("01").AtLeastOnce().Text()).Token();
 
-		protected internal virtual Parser<string> Hexadecimal
-		{
-			get
-			{
-				return Parse.IgnoreCase("0x").Then(x =>
-					Parse.Chars("0123456789ABCDEFabcdef").AtLeastOnce().Text()).Token();
-			}
-		}
+		protected internal virtual Parser<string> Hexadecimal =>
+			Parse.IgnoreCase("0x").Then(x =>
+				Parse.Chars("0123456789ABCDEFabcdef").AtLeastOnce().Text()).Token();
 
 		protected internal virtual ulong ConvertBinary(string bin)
 		{
@@ -56,58 +43,30 @@ namespace Sprache.Calc
 			throw new ParseException(hex + " cannot be parsed as hexadecimal number");
 		}
 
-		protected internal virtual Parser<string> Exponent
-		{
-			get
-			{
-				return Parse.Chars("Ee").Then(e => Parse.Number.Select(n => "e+" + n).XOr(
-					Parse.Chars("+-").Then(s => Parse.Number.Select(n => "e" + s + n))));
-			}
-		}
+		protected internal virtual Parser<string> Exponent =>
+			Parse.Chars("Ee").Then(e => Parse.Number.Select(n => "e+" + n).XOr(
+				Parse.Chars("+-").Then(s => Parse.Number.Select(n => "e" + s + n))));
 
-		protected internal override Parser<string> Decimal
-		{
-			get
-			{
-				return
-					from d in base.Decimal
-					from e in Exponent.Optional()
-					select d + e.GetOrElse(string.Empty);
-			}
-		}
+		protected internal override Parser<string> Decimal =>
+			from d in base.Decimal
+			from e in Exponent.Optional()
+			select d + e.GetOrElse(string.Empty);
 
-		protected internal override Parser<Expression> Constant
-		{
-			get
-			{
-				return
-					Hexadecimal.Select(x => Expression.Constant((double)ConvertHexadecimal(x)))
-					.Or(Binary.Select(b => Expression.Constant((double)ConvertBinary(b))))
-					.Or(base.Constant);
-			}
-		}
+		protected internal override Parser<Expression> Constant =>
+			Hexadecimal.Select(x => Expression.Constant((double)ConvertHexadecimal(x)))
+				.Or(Binary.Select(b => Expression.Constant((double)ConvertBinary(b))))
+				.Or(base.Constant);
 
-		protected internal virtual Parser<string> Identifier
-		{
-			get
-			{
-				return Parse.Letter.AtLeastOnce().Text().Then(h =>
-					Parse.LetterOrDigit.Many().Text().Select(t => h + t)).Token();
-			}
-		}
+		protected internal virtual Parser<string> Identifier =>
+			Parse.Letter.AtLeastOnce().Text().Then(h =>
+				Parse.LetterOrDigit.Many().Text().Select(t => h + t)).Token();
 
-		protected internal virtual Parser<Expression> FunctionCall
-		{
-			get
-			{
-				return
-					from name in Identifier
-					from lparen in Parse.Char('(')
-					from expr in Expr.DelimitedBy(Parse.Char(',').Token())
-					from rparen in Parse.Char(')')
-					select CallFunction(name, expr.ToArray());
-			}
-		}
+		protected internal virtual Parser<Expression> FunctionCall =>
+			from name in Identifier
+			from lparen in Parse.Char('(')
+			from expr in Expr.DelimitedBy(Parse.Char(',').Token())
+			from rparen in Parse.Char(')')
+			select CallFunction(name, expr.ToArray());
 
 		protected internal virtual Expression CallFunction(string name, params Expression[] parameters)
 		{
@@ -121,9 +80,7 @@ namespace Sprache.Calc
 			return Expression.Call(methodInfo, parameters);
 		}
 
-		protected internal override Parser<Expression> Factor
-		{
-			get { return base.Factor.XOr(FunctionCall); }
-		}
+		protected internal override Parser<Expression> Factor =>
+			base.Factor.XOr(FunctionCall);
 	}
 }
