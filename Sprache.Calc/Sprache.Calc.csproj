@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
     <PackageVersion></PackageVersion>
     <Title>Sprache Calculator</Title>
     <Authors>Alexey Yakovlev, Andrey Leskov</Authors>
@@ -13,11 +13,14 @@
     <RepositoryUrl>https://github.com/yallie/Sprache.Calc</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>sprache expression expressions evaluator calculator parser parsers linq monad</PackageTags>
-    <PackageReleaseNotes>Sprache toolkit grammar inheritance sample. Updated for .Net Standart 1.6 and added functionality to add user-defined functions from strings. For more details, see https://github.com/yallie/Sprache.Calc</PackageReleaseNotes>
+    <PackageReleaseNotes>Sprache toolkit grammar inheritance sample. Updated for .Net Standard 1.6 and added functionality to add user-defined functions from strings. For more details, see https://github.com/yallie/Sprache.Calc</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Sprache" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.1" />
   </ItemGroup>
 

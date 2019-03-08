@@ -32,12 +32,9 @@ namespace Sprache.Calc.Tests
 		public void UserFunctionCanWork()
 		{
 			var calc = (XtensibleCalculator) CreateCalculator();
-			
 			calc.RegisterFunction("User", (aU,bU,cU) => calc.ParseExpression("Min(a,b,c)", new Dictionary<string,double>(){{"a",aU},{"b",bU},{"c",cU}}).Compile().Invoke());
 
-		
 			var func = calc.ParseExpression("User(a,b,c)", new Dictionary<string,double>(){{"a",1},{"b",2},{"c",3}}).Compile();
-			
 			Assert.Equal(1, func());
 		}
 
@@ -48,7 +45,7 @@ namespace Sprache.Calc.Tests
 			calc.RegisterFunction("UserB", "Min(a,b,c)", "a", "b", "c");
 			var func = calc.ParseExpression("UserB(a,b,c)",
 				new Dictionary<string, double>() {{"a", 1}, {"b", 2}, {"c", 3}}).Compile();
-			
+
 			Assert.Equal(1, func());
 		}
 

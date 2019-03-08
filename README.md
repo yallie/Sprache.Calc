@@ -1,6 +1,9 @@
 Sprache.Calc
 ============
 
+[![Appveyor build status](https://ci.appveyor.com/api/projects/status/qswh0wj2uv3w502v?svg=true)](https://ci.appveyor.com/project/yallie/sprache-calc)
+[![Tests](https://img.shields.io/appveyor/tests/yallie/sprache-calc.svg)](https://ci.appveyor.com/project/yallie/sprache-calc/build/tests)
+
 This library provides easy to use extensible expression evaluator based on [LinqyCalculator sample](https://github.com/sprache/Sprache/blob/master/samples/LinqyCalculator/ExpressionParser.cs).
 The evaluator supports arithmetic operations, custom functions and parameters. It takes string
 representation of an expression and converts it to a structured LINQ expression instance

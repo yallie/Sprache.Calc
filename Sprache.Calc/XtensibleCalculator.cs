@@ -151,18 +151,25 @@ namespace Sprache.Calc
 			CustomFuctions[MangleName(name, 5)] = x => function(x[0], x[1], x[2], x[3], x[4]);
 			return this;
 		}
-		
+
 		public XtensibleCalculator RegisterFunction(string name, string functionExpression, params string[] parameters)
 		{
+			// Func<Dictionary, double>
+			var compiledFunction = ParseFunction(functionExpression).Compile();
+
 			//syntactic sugar: ParseExpression("a + b / c", "a","b","c")
 			CustomFuctions[MangleName(name, parameters.Length)] = x =>
 			{
-				var parametersDictionary = new Dictionary<string,double>();
-				for(int paramSeq = 0;paramSeq < parameters.Length; paramSeq++)
-					parametersDictionary.Add(parameters[paramSeq],x[paramSeq]);
+				// convert double[] to Dictionary
+				var parametersDictionary = new Dictionary<string, double>();
+				for (int paramSeq = 0; paramSeq < parameters.Length; paramSeq++)
+				{
+					parametersDictionary.Add(parameters[paramSeq], x[paramSeq]);
+				}
 
-				return this.ParseExpression(functionExpression,parametersDictionary).Compile().Invoke();
+				return compiledFunction(parametersDictionary);
 			};
+
 			return this;
 		}
 	}
