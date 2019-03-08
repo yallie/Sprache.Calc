@@ -100,7 +100,7 @@ namespace Sprache.Calc
 			if (CustomFuctions.ContainsKey(mangledName))
 			{
 				// convert parameters
-				var callCustomFunction = new Func<string, double[], double>(CallCustomFunction).Method;
+				var callCustomFunction = new Func<string, double[], double>(CallCustomFunction).GetMethodInfo();
 				var newParameters = new List<Expression>();
 				newParameters.Add(Expression.Constant(mangledName));
 				newParameters.Add(Expression.NewArrayInit(typeof(double), parameters));
@@ -149,6 +149,20 @@ namespace Sprache.Calc
 		public XtensibleCalculator RegisterFunction(string name, Func<double, double, double, double, double, double> function)
 		{
 			CustomFuctions[MangleName(name, 5)] = x => function(x[0], x[1], x[2], x[3], x[4]);
+			return this;
+		}
+		
+		public XtensibleCalculator RegisterFunction(string name, string functionExpression, params string[] parameters)
+		{
+			//syntactic sugar: ParseExpression("a + b / c", "a","b","c")
+			CustomFuctions[MangleName(name, parameters.Length)] = x =>
+			{
+				var parametersDictionary = new Dictionary<string,double>();
+				for(int paramSeq = 0;paramSeq < parameters.Length; paramSeq++)
+					parametersDictionary.Add(parameters[paramSeq],x[paramSeq]);
+
+				return this.ParseExpression(functionExpression,parametersDictionary).Compile().Invoke();
+			};
 			return this;
 		}
 	}

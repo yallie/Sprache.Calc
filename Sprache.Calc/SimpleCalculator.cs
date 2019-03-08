@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
+[assembly:InternalsVisibleTo("Sprache.Calc.Tests")]
 namespace Sprache.Calc
 {
 	/// <summary>
@@ -68,7 +70,7 @@ namespace Sprache.Calc
 		protected internal virtual Parser<Expression> Term =>
 			Parse.ChainOperator(Multiply.Or(Divide).Or(Modulo), InnerTerm, Expression.MakeBinary);
 
-		protected internal virtual Parser<Expression> Expr =>
+		protected internal Parser<Expression> Expr =>
 			Parse.ChainOperator(Add.Or(Subtract), Term, Expression.MakeBinary);
 
 		protected internal virtual Parser<LambdaExpression> Lambda =>

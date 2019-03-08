@@ -1,0 +1,33 @@
+version: 0.0.{build}
+branches:
+  only:
+  - master
+image: Ubuntu
+
+install:
+- sh: |
+    
+    . ./build/git_versioning.sh
+
+    export APP_VERSION=${version}
+    export FILE_VERSION=${fileVersion}
+    export INFORMATIONAL_VERSION=${informationVersion}
+
+    echo "exported app version is $APP_VERSION"
+    echo "exported file version is $FILE_VERSION"
+    echo "exported info version is $INFORMATIONAL_VERSION"
+
+- ps: Update-AppveyorBuild -Version $env:APP_VERSION
+build_script:
+- sh: |
+    dotnet build Sprache.Calc /p:Version=$APP_VERSION /p:FileVersion=$FILE_VERSION /p:InformationVersion="$INFORMATIONAL_VERSION"  -c Release -v Minimal /l:"/opt/appveyor/build-agent/AppVeyor.MSBuildLogger.dll"
+    dotnet pack Sprache.Calc  /p:Version=$APP_VERSION /p:FileVersion=$FILE_VERSION /p:InformationVersion="$INFORMATIONAL_VERSION"  -c Release -v Minimal --include-symbols --include-source --no-build /l:"/opt/appveyor/build-agent/AppVeyor.MSBuildLogger.dll"
+test_script:
+- sh: |
+    dotnet test
+artifacts:
+- path: '**\Sprache.*.nupkg'
+  name: Packages
+deploy:
+  - provider: Environment
+    name: MyGet development feed
