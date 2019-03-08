@@ -8,6 +8,7 @@
 .idea/
 .DS_Store/
 .DS_Store
+.vs
 
 # Build results
 [Dd]ebug/
