@@ -10,6 +10,8 @@ representation of an expression and converts it to a structured LINQ expression 
 which can easily be compiled to an executable delegate. In contrast with interpreted expression
 evaluators such as NCalc, compiled expressions perform just as fast as native C# methods.
 
+![Instaco.de](/Sprache.Calc.Icons/Instacode91251.png)
+
 Usage example
 -------------
 
@@ -24,7 +26,12 @@ Console.WriteLine("Result = {0}", func());
 // custom functions
 calc.RegisterFunction("Mul", (a, b, c) => a * b * c);
 expr = calc.ParseExpression("2 ^ Mul(PI, a, b)", a => 2, b => 10);
-Console.WriteLine("Result = {0}", func.Compile()());
+Console.WriteLine("Result = {0}", expr.Compile()());
+
+// end-user's functions
+calc.RegisterFunction("Add", "a + b", "a", "b");
+expr = calc.ParseExpression("Add(353, 181)");
+Console.WriteLine("Result = {0}", expr.Compile()());
 ```
 
 Installation
